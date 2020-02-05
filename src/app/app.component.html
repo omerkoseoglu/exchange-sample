@@ -1,3 +1,4 @@
+<ngx-spinner></ngx-spinner>
 <div class="container mt-3">
   <div class="row">
     <div class="col">
@@ -6,7 +7,7 @@
           <div class="dx-field-label">Tarih</div>
           <div class="dx-field-value">
             <dx-date-box
-              [value]="now"
+              #exchangeDate
               [max]="now"
               displayFormat="dd.MM.yyyy"
               (valueChange)="dateBoxValueChange($event)"
@@ -23,27 +24,18 @@
         <fa-icon [icon]="faExclamationTriangle"></fa-icon> Kur bilgisi bulunamadı.
       </div>
       <div *ngIf="exchange">
-        <!--Unit: "1"
-        Isim: "ABD DOLARI"
-        CurrencyName: "US DOLLAR"
-        ForexBuying: "5.9714"
-        ForexSelling: "5.9822"
-        BanknoteBuying: "5.9673"
-        BanknoteSelling: "5.9912"
-        CrossRateUSD: ""
-        [columns]="['Isim', 'ForexBuying', 'ForexSelling']"
-        CrossRateOther: ""-->
         <dx-data-grid
           id="gridContainer"
           [showRowLines]="true"
           [rowAlternationEnabled]="true"
-          [dataSource]="exchange.Tarih_Date.Currency"
+          [dataSource]="exchange"
           [showBorders]="true">
           <dxo-search-panel
             [visible]="true"
             [highlightCaseSensitive]="true"
           ></dxo-search-panel>
           <dxi-column dataField="@attributes.Kod" caption="Döviz" alignment="left" cellTemplate="cellTemplate"></dxi-column>
+          <dxi-column dataField="Unit" caption="Birim" dataType="number" alignment="center"></dxi-column>
           <dxi-column dataField="ForexBuying" caption="Alış" dataType="number" alignment="right"></dxi-column>
           <dxi-column dataField="ForexSelling" caption="Satış" dataType="number" alignment="right"></dxi-column>
 

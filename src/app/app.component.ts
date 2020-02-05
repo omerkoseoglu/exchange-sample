@@ -1,63 +1,54 @@
-import { Component } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { DatePipe } from '@angular/common';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { map } from 'rxjs/operators';
-import { Welcome } from './currency.model';
-import { NgxXml2jsonService } from 'ngx-xml2json';
+import { Currency } from './currency.model';
+import { ExchangeService } from './exchange.service';
+import { DxDateBoxComponent } from 'devextreme-angular';
+import { Title } from '@angular/platform-browser';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { delay, finalize} from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit, AfterViewInit {
 
   faExclamationTriangle = faExclamationTriangle;
-
-  title = 'exchange-sample';
-  exchange: Welcome;
+  title = 'TCMB Exchange Rates Sample';
+  exchange: Currency[] = [];
   now: Date = new Date();
-  parser = new DOMParser();
+
+  @ViewChild('exchangeDate', { static: false }) dateBox: DxDateBoxComponent;
 
   constructor(
-    private http: HttpClient,
-    private datePipe: DatePipe,
-    private xml2JsonService: NgxXml2jsonService
+    private exchangeService: ExchangeService,
+    private titleService: Title,
+    private spinner: NgxSpinnerService
   ) {
-  }
-
-  private getDateStringWithFormat(date: Date, format: string): string {
-    return this.datePipe.transform(date, format);
+    this.titleService.setTitle(this.title);
   }
 
   dateBoxValueChange(date: Date) {
-    this.getExchangeRate(date);
-  }
 
-  private getExchangeRate(date: Date) {
-    const dateStr = this.getDateStringWithFormat(date, 'ddMMyyyy');
-    const yearMonth = this.getDateStringWithFormat(date, 'yyyyMM');
+    this.spinner.show();
 
-    const headers = new HttpHeaders({ 'Content-Type': 'text/xml' }).set('Accept', 'text/xml');
-
-    const url = `/kurlar/${yearMonth}/${dateStr}.xml`;
-
-    this.http.get(url, { headers, responseType: 'text' })
+    this.exchangeService.getExchangeRate(date)
       .pipe(
-        map(result => {
-          const xml = this.parser.parseFromString(result, 'text/xml');
-          const obj = this.xml2JsonService.xmlToJson(xml);
-          const data: Welcome = JSON.parse(JSON.stringify(obj));
-          return data;
-        }),
+        delay(4000),
+        finalize(() => this.spinner.hide())
       )
       .subscribe(result => {
-        this.exchange = JSON.parse(JSON.stringify(result));
-        this.exchange.Tarih_Date.Currency = this.exchange.Tarih_Date.Currency.filter(f => f['@attributes'].Kod !== 'XDR')
-        console.log(JSON.stringify(result));
-        console.log(this.exchange.Tarih_Date.Currency);
+        this.exchange = result.Tarih_Date.Currency.filter(f => f['@attributes'].Kod !== 'XDR');
       });
+
   }
 
+  ngAfterViewInit(): void {
+    this.dateBox.value = this.now;
+  }
+
+  ngOnInit(): void {
+    this.spinner.show();
+  }
 }
