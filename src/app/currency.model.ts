@@ -1,4 +1,4 @@
-export interface Welcome {
+export interface Exchange {
   Tarih_Date: TarihDate;
 }
 

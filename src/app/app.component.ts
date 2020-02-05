@@ -40,6 +40,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       )
       .subscribe(result => {
         this.exchange = result.Tarih_Date.Currency.filter(f => f['@attributes'].Kod !== 'XDR');
+      }, error => {
+        this.exchange = [];
       });
 
   }
