@@ -1,23 +1,5 @@
 <ngx-spinner></ngx-spinner>
 <div class="container mt-3">
-  <div class="row">
-    <div class="col">
-      <div class="dx-fieldset">
-        <div class="dx-field">
-          <div class="dx-field-label">Tarih</div>
-          <div class="dx-field-value">
-            <dx-date-box
-              #exchangeDate
-              [max]="now"
-              displayFormat="dd.MM.yyyy"
-              (valueChange)="dateBoxValueChange($event)"
-              type="date">
-            </dx-date-box>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="row mt-3">
     <div class="col">
       <div *ngIf="!exchange" class="alert alert-warning" role="alert">
@@ -25,11 +7,13 @@
       </div>
       <div *ngIf="exchange">
         <dx-data-grid
+          #dataGrid
           id="gridContainer"
           [showRowLines]="true"
           [rowAlternationEnabled]="true"
           [dataSource]="exchange"
-          [showBorders]="true">
+          [showBorders]="true"
+          (onToolbarPreparing)="onToolbarPreparing($event)">
           <dxo-search-panel
             [visible]="true"
             [highlightCaseSensitive]="true"
@@ -41,11 +25,9 @@
 
           <div *dxTemplate="let data of 'cellTemplate'">
             <div class="currency-flag currency-flag-{{data.value.toLowerCase()}}"></div>
-             {{data.value}}
+             {{data.value}} / TL
           </div>
-
-
-
+          
         </dx-data-grid>
       </div>
     </div>

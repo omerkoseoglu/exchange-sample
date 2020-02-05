@@ -2,7 +2,7 @@ import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { Currency } from './currency.model';
 import { ExchangeService } from './exchange.service';
-import { DxDateBoxComponent } from 'devextreme-angular';
+import { DxDataGridComponent } from 'devextreme-angular';
 import { Title } from '@angular/platform-browser';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { delay, finalize} from 'rxjs/operators';
@@ -12,14 +12,14 @@ import { delay, finalize} from 'rxjs/operators';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class AppComponent implements OnInit {
 
   faExclamationTriangle = faExclamationTriangle;
   title = 'TCMB Exchange Rates Sample';
   exchange: Currency[] = [];
   now: Date = new Date();
 
-  @ViewChild('exchangeDate', { static: false }) dateBox: DxDateBoxComponent;
+  @ViewChild('dataGrid', { static: false }) dataGrid: DxDataGridComponent;
 
   constructor(
     private exchangeService: ExchangeService,
@@ -29,8 +29,15 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.titleService.setTitle(this.title);
   }
 
-  dateBoxValueChange(date: Date) {
+  dateBoxValueChange(date: any) {
+    this.getExchangeRates(date.value);
+  }
 
+  ngOnInit(): void {
+    this.getExchangeRates(this.now);
+  }
+
+  getExchangeRates(date: Date) {
     this.spinner.show();
 
     this.exchangeService.getExchangeRate(date)
@@ -43,14 +50,18 @@ export class AppComponent implements OnInit, AfterViewInit {
       }, error => {
         this.exchange = [];
       });
-
   }
 
-  ngAfterViewInit(): void {
-    this.dateBox.value = this.now;
-  }
-
-  ngOnInit(): void {
-    this.spinner.show();
+  onToolbarPreparing($event: any) {
+    $event.toolbarOptions.items.unshift({
+      location: 'before',
+      widget: 'dxDateBox',
+      options: {
+        width: 200,
+        value: this.now,
+        displayFormat: 'dd.MM.yyyy',
+        onValueChanged: this.dateBoxValueChange.bind(this)
+      }
+    });
   }
 }
