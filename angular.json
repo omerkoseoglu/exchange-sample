@@ -28,9 +28,16 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/devextreme/dist/css/dx.common.css",
+              "node_modules/devextreme/dist/css/dx.light.css",
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "./node_modules/currency-flags/dist/currency-flags.min.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/jquery/dist/jquery.min.js",
+              "./node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -125,6 +132,7 @@
           }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "exchange-sample"
 }
